@@ -7,8 +7,10 @@
   "author": "Nathan Thompson <nthompson@dega.io>",
   "license": "MIT",
   "dependencies": {
+    "dotenv": "^16.0.3",
     "puppeteer": "^19.2.2",
     "puppeteer-extra": "^3.3.4",
-    "puppeteer-extra-plugin-stealth": "^2.11.1"
+    "puppeteer-extra-plugin-stealth": "^2.11.1",
+    "twilio": "^3.83.2"
   }
 }

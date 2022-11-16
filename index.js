@@ -3,6 +3,9 @@
 const puppeteer = require('puppeteer-extra');
 const StealthPlugin = require('puppeteer-extra-plugin-stealth')
 const { executablePath } = require('puppeteer')
+const accountSid = process.env.TWILIO_ACCOUNT_SID;
+const authToken = process.env.TWILIO_AUTH_TOKEN;
+const client = require('twilio')(accountSid, authToken);
 
 async function main() {
   const STORE_ID = '181'
@@ -10,7 +13,18 @@ async function main() {
   const URL = 'https://www.microcenter.com/product/652626/intel-core-i7-13700k-raptor-lake-34ghz-sixteen-core-lga-1700-boxed-processor-heatsink-not-included'
 
   const inStock = await isInStock(URL, STORE_ID)
-  console.log('in stock:', inStock)
+
+  if (inStock) {
+    console.log('in stock')
+
+    await client.messages.create({
+      body: 'Your watched product is in stock at MicroCenter!',
+      from: process.env.TWILIO_FROM_NUMBER,
+      to: process.env.TWILIO_TO_NUMBER
+    })
+  } else {
+    console.log('out of stock')
+  }
 }
 
 main().catch(console.error)
