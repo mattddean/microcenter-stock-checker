@@ -7,10 +7,26 @@ const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
 const client = require('twilio')(accountSid, authToken);
 
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
 async function main() {
+  let attempt = 0
+
+  while (true) {
+    console.log('attempt', attempt)
+    const inStock = await loop()
+    if (inStock) return // quit the program once we've detected that the product is in stock
+    await sleep(180000) // 3 minutes
+    attempt++
+  }
+}
+
+main().catch(console.error)
+
+async function loop() {
   const STORE_ID = '181'
-  // const URL = 'https://www.microcenter.com/product/641917/intel-core-i7-12700k-alder-lake-36ghz-twelve-core-lga-1700-boxed-processor-heatsink-not-included'
-  const URL = 'https://www.microcenter.com/product/652626/intel-core-i7-13700k-raptor-lake-34ghz-sixteen-core-lga-1700-boxed-processor-heatsink-not-included'
+  const URL = 'https://www.microcenter.com/product/641917/intel-core-i7-12700k-alder-lake-36ghz-twelve-core-lga-1700-boxed-processor-heatsink-not-included'
+  // const URL = 'https://www.microcenter.com/product/652626/intel-core-i7-13700k-raptor-lake-34ghz-sixteen-core-lga-1700-boxed-processor-heatsink-not-included'
 
   const inStock = await isInStock(URL, STORE_ID)
 
@@ -25,9 +41,9 @@ async function main() {
   } else {
     console.log('out of stock')
   }
-}
 
-main().catch(console.error)
+  return inStock
+}
 
 async function isInStock(url, storeId) {
   puppeteer.use(StealthPlugin())
