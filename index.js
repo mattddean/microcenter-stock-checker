@@ -6,12 +6,14 @@ const { executablePath } = require('puppeteer')
 
 async function main() {
   const STORE_ID = '181'
-  // const url = 'https://www.microcenter.com/product/641917/intel-core-i7-12700k-alder-lake-36ghz-twelve-core-lga-1700-boxed-processor-heatsink-not-included'
-  const url = 'https://www.microcenter.com/product/652626/intel-core-i7-13700k-raptor-lake-34ghz-sixteen-core-lga-1700-boxed-processor-heatsink-not-included'
+  // const URL = 'https://www.microcenter.com/product/641917/intel-core-i7-12700k-alder-lake-36ghz-twelve-core-lga-1700-boxed-processor-heatsink-not-included'
+  const URL = 'https://www.microcenter.com/product/652626/intel-core-i7-13700k-raptor-lake-34ghz-sixteen-core-lga-1700-boxed-processor-heatsink-not-included'
 
-  const inStock = await isInStock(url, STORE_ID)
+  const inStock = await isInStock(URL, STORE_ID)
   console.log('in stock:', inStock)
 }
+
+main().catch(console.error)
 
 async function isInStock(url, storeId) {
   puppeteer.use(StealthPlugin())
@@ -21,7 +23,7 @@ async function isInStock(url, storeId) {
   page.setCookie({'name': 'storeSelected', 'value': storeId, domain: '.microcenter.com', session: false, secure: true})
   page.setCookie({'name': 'myStore', 'value': 'true', domain: '.microcenter.com', session: true, secure: true})
 
-  // Load micro center page
+  // Load MicroCenter page.
   await page.goto(`${url}?storeid=${storeId}`);
 
   // Wait for the results page to load and display the results.
@@ -32,11 +34,10 @@ async function isInStock(url, storeId) {
 
   await browser.close();
 
+  // The .inventoryCnt element is only present in the DOM when the item is in stock.
   if (inventoryStatusElement) {
     return true
   } else {
     return false
   }  
 }
-
-main().catch(console.error)
